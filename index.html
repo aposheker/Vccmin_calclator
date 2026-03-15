@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRAM Vccmin Calculator</title>
+    <meta name="description" content="A tool based on statistical SRAM Vccmin models for Cache Vccmin.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-mesh"></div>
+    <div class="container">
+        <header>
+            <h1>SRAM Vccmin Calculator</h1>
+            <p>Statistical Cache Yield & Minimum Voltage Modeling</p>
+        </header>
+
+        <main>
+            <div class="glass-panel inputs-panel">
+                <h2>Array specifications</h2>
+                <div class="input-group">
+                    <label for="cacheSize">Array Size (MB)</label>
+                    <input type="number" id="cacheSize" value="32" step="0.5" min="0.1">
+                </div>
+                <div class="input-group">
+                    <label for="yieldTarget">Target Array Yield (%)</label>
+                    <input type="number" id="yieldTarget" value="99.0" step="0.1" max="99.999" min="1">
+                </div>
+
+                <div class="separator"></div>
+
+                <h2>Cell Margins (mV)</h2>
+                <p class="subtitle">Enter expected mean (μ) and standard deviation (σ) for each failure mechanism</p>
+
+                <div class="margin-inputs">
+                    <div class="margin-column">
+                        <h3>Read Vmin</h3>
+                        <div class="input-group">
+                            <label for="readMu">μ vmin</label>
+                            <input type="number" id="readMu" value="450">
+                        </div>
+                        <div class="input-group">
+                            <label for="readSigma">σ vmin</label>
+                            <input type="number" id="readSigma" value="25">
+                        </div>
+                    </div>
+                    <div class="margin-column">
+                        <h3>Write Vmin</h3>
+                        <div class="input-group">
+                            <label for="writeMu">μ vmin</label>
+                            <input type="number" id="writeMu" value="480">
+                        </div>
+                        <div class="input-group">
+                            <label for="writeSigma">σ vmin</label>
+                            <input type="number" id="writeSigma" value="30">
+                        </div>
+                    </div>
+                    <div class="margin-column">
+                        <h3>Retention Vmin</h3>
+                        <div class="input-group">
+                            <label for="retMu">μ vmin</label>
+                            <input type="number" id="retMu" value="350">
+                        </div>
+                        <div class="input-group">
+                            <label for="retSigma">σ vmin</label>
+                            <input type="number" id="retSigma" value="15">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-panel outputs-panel">
+                <h2>Analysis Results</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">Required Z-Score</div>
+                        <div class="stat-value" id="zScoreLabel">0.00σ</div>
+                        <div class="stat-sub">Cell fail prob: <span id="pFailLabel">0</span></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Array Size (Bits)</div>
+                        <div class="stat-value" id="totalBitsLabel">0</div>
+                        <div class="stat-sub">Cells</div>
+                    </div>
+                </div>
+
+                <h2 class="mt-8">Limiting Voltages</h2>
+                <div class="limits-container">
+                    <div class="limit-bar-wrapper">
+                        <div class="limit-label">
+                            <span>Read Vccmin</span>
+                            <span class="limit-val" id="readVminOut">0 mV</span>
+                        </div>
+                        <div class="limit-track">
+                            <div class="limit-fill fill-read" id="readFill"></div>
+                        </div>
+                    </div>
+                    <div class="limit-bar-wrapper">
+                        <div class="limit-label">
+                            <span>Write Vccmin</span>
+                            <span class="limit-val" id="writeVminOut">0 mV</span>
+                        </div>
+                        <div class="limit-track">
+                            <div class="limit-fill fill-write" id="writeFill"></div>
+                        </div>
+                    </div>
+                    <div class="limit-bar-wrapper">
+                        <div class="limit-label">
+                            <span>Retention Vccmin</span>
+                            <span class="limit-val" id="retVminOut">0 mV</span>
+                        </div>
+                        <div class="limit-track">
+                            <div class="limit-fill fill-ret" id="retFill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vccmin-final">
+                    <div class="final-title">Overall Cache Vccmin</div>
+                    <div class="final-value" id="cacheVccminOut">0 mV</div>
+                    <div class="final-subtitle">Determined by <span id="limiterType">---</span></div>
+                </div>
+            </div>
+
+            <div class="glass-panel chart-panel">
+                <h2>Vmin Probability Density Distributions</h2>
+                <div class="chart-container" style="position: relative; height: 350px; width: 100%;">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
