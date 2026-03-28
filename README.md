@@ -89,3 +89,13 @@ To ensure standard scientific robustness, several layers of tests and validation
 
 4. **Visual Layout and Viewport Testing**
    - **Check**: Browser automated testing verified that the generated Gaussian curves ($y = \frac{1}{\sigma \sqrt{2\pi}} e^{-\frac{1}{2}(\frac{x-\mu}{\sigma})^2}$) render accurately within the Chart.js canvas across all calculated limiting domains. Dynamic line boundaries recalculate upon each keystroke.
+
+---
+
+## 5. License & Disclaimer
+
+### License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### Disclaimer
+**This is a personal, open-source project.** The views, models, and code presented within this repository are strictly for educational and informational purposes. They do not represent the opinions, strategies, internal methodologies, proprietary intellectual property (IP), or explicit endorsements of any of my past, present, or future employers. All concepts discussed are based entirely on publicly available industry literature and academic research papers.
