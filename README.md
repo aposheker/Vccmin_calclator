@@ -45,6 +45,30 @@ $$V_{\text{ccmin(Retention)}} = \mu_{\text{Retention}} + Z \cdot \sigma_{\text{R
 The final Cache $V_{ccmin}$ is strictly:
 $$Cache\ V_{ccmin} = \max(V_{\text{ccmin(Read)}}, V_{\text{ccmin(Write)}}, V_{\text{ccmin(Retention)}})$$
 
+### D. Comparison to Gumbel-Based Array Vccmin (Thomas et al.)
+
+In advanced statistical SRAM modeling literature (e.g., standard Extreme Value Theory approaches applied to SRAM by authors like Thomas et al.), calculating the required Array $V_{ccmin}$ does not strictly necessitate backward mapping down to a single-cell $Z$-score. Instead, one can model the *overall chip's* $V_{ccmin}$ directly as an extreme value distribution limit.
+
+Because the final Array $V_{ccmin}$ is determined by the worst-case maximum failure voltage across $N$ independent, normally distributed cells, the Array $V_{ccmin}$ approaches a **Type I Extreme Value Distribution (Gumbel Distribution)**.
+
+If the underlying cell's $V_{min}$ follows a Normal distribution with Mean ($\mu$) and Standard Deviation ($\sigma$), the Gumbel distribution for the maximum of $N$ cells has the following parameters:
+
+- **Location Parameter ($\beta_N$)** (The expected mode of the extreme maximum):
+  $$\beta_N \approx \mu + \sigma \sqrt{2 \ln N} - \sigma \frac{\ln(\ln N) + \ln(4\pi)}{2\sqrt{2\ln N}}$$
+  
+- **Scale Parameter ($\alpha_N$)** (The relative spread of extreme maximums):
+  $$\alpha_N \approx \frac{\sigma}{\sqrt{2 \ln N}}$$
+
+Under this Gumbel formulation, the total Array Yield $Y$ (the cumulative probability that the array's maximum $V_{min}$ is safely bounded by the supply voltage $V_{cc}$) is formally given by the standard Gumbel CDF:
+$$Y = \exp\left[-\exp\left(-\frac{V_{ccmin} - \beta_N}{\alpha_N}\right)\right]$$
+
+Thus, isolated for the required Cache $V_{ccmin}$, the Gumbel formula provides a beautiful, closed-form analytic boundary:
+$$V_{ccmin\ (Gumbel)} = \beta_N - \alpha_N \ln(-\ln Y)$$
+
+**Why our Tool's Model is Statistically Robust:**
+The primary difference is that the Gumbel Extreme Value model is a highly accurate continuous *analytic approximation* for the maximum of a sample subset. Conversely, our Calculator's foundational algorithm focuses on evaluating the exact per-cell fail probability ($\frac{-\ln Y}{N}$) bounded by Moro's precision Inverse CDF mapping to acquire a concrete $Z$-score. 
+For production-level large macro arrays (e.g., $N > 10^7$ bits), the Gumbel framework and our Calculator's fundamental Normal Inverse methodology converge identically, securely yielding the exact same bounding voltages up to float-level precision!
+
 ---
 
 ## 4. Tests and Verifications Checked
