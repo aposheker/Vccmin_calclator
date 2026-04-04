@@ -9,6 +9,7 @@
     --neon-green: #10b981;
     --neon-orange: #f59e0b;
     --neon-red: #ef4444;
+    --neon-rose: #f43f5e;
     
     /* Glass */
     --glass-bg: rgba(30, 41, 59, 0.4);
@@ -74,6 +75,7 @@ header h1 {
     font-weight: 800;
     background: linear-gradient(135deg, #fff, #94a3b8);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 0.5rem;
 }
@@ -167,7 +169,7 @@ input[type="number"]:focus {
 
 .margin-inputs {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 1rem;
 }
 
@@ -259,6 +261,7 @@ input[type="number"]:focus {
 .fill-read { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
 .fill-write { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
 .fill-ret { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
+.fill-eb { background: var(--neon-rose); box-shadow: 0 0 10px var(--neon-rose); }
 
 .vccmin-final {
     margin-top: 2.5rem;

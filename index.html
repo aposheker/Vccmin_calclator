@@ -32,7 +32,11 @@
                 </div>
                 <div class="input-group">
                     <label for="yieldTarget">Target Array Yield (%)</label>
-                    <input type="number" id="yieldTarget" value="99.0" step="0.1" max="99.999" min="1">
+                    <input type="number" id="yieldTarget" value="99.0" step="0.1" max="99.9999" min="1">
+                </div>
+                <div class="input-group">
+                    <label for="dpmTarget">Target DPM (Defects Per Million)</label>
+                    <input type="number" id="dpmTarget" value="10000" step="1" min="1">
                 </div>
 
                 <div class="separator"></div>
@@ -41,6 +45,10 @@
                 <div class="input-group">
                     <label for="temperature">Temperature (°C)</label>
                     <input type="number" id="temperature" value="25" min="-40" max="150" step="1">
+                </div>
+                <div class="input-group">
+                    <label for="lifetime">Target Lifetime (Years)</label>
+                    <input type="number" id="lifetime" value="0" min="0" max="20" step="0.5">
                 </div>
 
                 <div class="separator"></div>
@@ -80,6 +88,17 @@
                         <div class="input-group">
                             <label for="retSigma">σ vmin</label>
                             <input type="number" id="retSigma" value="15">
+                        </div>
+                    </div>
+                    <div class="margin-column">
+                        <h3>Erratic Bit Vmin</h3>
+                        <div class="input-group">
+                            <label for="ebMu">μ vmin</label>
+                            <input type="number" id="ebMu" value="400">
+                        </div>
+                        <div class="input-group">
+                            <label for="ebSigma">σ vmin</label>
+                            <input type="number" id="ebSigma" value="40">
                         </div>
                     </div>
                 </div>
@@ -127,6 +146,15 @@
                         </div>
                         <div class="limit-track">
                             <div class="limit-fill fill-ret" id="retFill"></div>
+                        </div>
+                    </div>
+                    <div class="limit-bar-wrapper">
+                        <div class="limit-label">
+                            <span>Erratic Bit Vccmin</span>
+                            <span class="limit-val" id="ebVminOut">0 mV</span>
+                        </div>
+                        <div class="limit-track">
+                            <div class="limit-fill fill-eb" id="ebFill"></div>
                         </div>
                     </div>
                 </div>
