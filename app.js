@@ -72,14 +72,14 @@ function updateCalculator() {
     if(isNaN(lifetime)) lifetime = 0;
     if(lifetime > 100) lifetime = 100;
     if(lifetime < 0) lifetime = 0;
-    // Lifetime aging coefficient: +5 mV per year degradation for Read, Retention, and EB.
-    const ageDegradation = lifetime * 5;
+    // Aging: 2mV per year for Read as specified. No aging for write.
+    const ageDegradation = lifetime * 2.0;
 
     // Apply scaling coefficients based on physical modeling
     // Write Vmin reduces by ~0.4mV/C, Read Vmin increases by ~0.2mV/C, Retention by ~0.4mV/C
     const rMu = rMuBase + (deltaT * 0.2) + ageDegradation;
     const wMu = wMuBase + (deltaT * -0.4);
-    const retMu = retMuBase + (deltaT * 0.4) + ageDegradation;
+    const retMu = retMuBase + (deltaT * 0.4); // no aging parameter defined for retention by user
 
     // 3. Compute limits
     const readVccmin = rMu + zScore * rSig;
@@ -117,6 +117,7 @@ function updateCalculator() {
     // 6. Update Distribution Chart
     if (typeof Chart !== 'undefined') {
         updateChart(rMu, rSig, wMu, wSig, retMu, retSig, finalCacheVccmin, zScore);
+        updateDpmChart(rMuBase, rSig, wMuBase, wSig, retMuBase, retSig, deltaT, ebNoise, finalCacheVccmin, N);
     }
 }
 
@@ -201,6 +202,76 @@ function generateGaussianData(mu, sigma, xValues) {
         const coeff = 1 / (sigma * Math.sqrt(2 * Math.PI));
         return coeff * Math.exp(exponent);
     });
+}
+
+function normCDF(z) {
+    if (z < 0) return 1 - normCDF(-z);
+    const p = 0.2316419;
+    const b1 = 0.319381530;
+    const b2 = -0.356563782;
+    const b3 = 1.781477937;
+    const b4 = -1.821255978;
+    const b5 = 1.330274429;
+    
+    const t = 1 / (1 + p * z);
+    const term = t * (b1 + t * (b2 + t * (b3 + t * (b4 + t * b5))));
+    const pdf = (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * z * z);
+    return term * pdf;
+}
+
+let dpmChart = null;
+
+function updateDpmChart(baseR, sigR, baseW, sigW, baseRet, sigRet, deltaT, ebNoise, vTarget, N) {
+    const ctx = document.getElementById('dpmChart').getContext('2d');
+    const years = [];
+    const dpmVals = [];
+    const effectiveLimit = vTarget - ebNoise;
+
+    for (let y = 0; y <= 15; y += 1) {
+        years.push(y);
+        const ageShift = y * 2.0;
+        
+        const rMu = baseR + (deltaT * 0.2) + ageShift;
+        const wMu = baseW + (deltaT * -0.4); 
+        const retMu = baseRet + (deltaT * 0.4); 
+        
+        const zR = (effectiveLimit - rMu) / sigR;
+        const zW = (effectiveLimit - wMu) / sigW;
+        const zRet = (effectiveLimit - retMu) / sigRet;
+        
+        const maxFailP = Math.max(normCDF(zR), normCDF(zW), normCDF(zRet));
+        const yieldProb = Math.exp(-maxFailP * N);
+        const dpm = Math.min(1e6, (1 - yieldProb) * 1000000);
+        dpmVals.push(Math.max(dpm, 0.1)); // floor at 0.1 for nice log scale
+    }
+    
+    const config = {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: [{
+                label: 'Predicted Array DPM vs Lifetime given Vccmin Limit',
+                data: dpmVals,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { title: { display: true, text: 'Time (Years)', color: '#94a3b8' }, ticks: { color: '#94a3b8' } },
+                y: { type: 'logarithmic', title: { display: true, text: 'DPM (Log)', color: '#94a3b8' }, ticks: { color: '#94a3b8' } }
+            },
+            plugins: { legend: { labels: { color: '#e2e8f0' } } }
+        }
+    };
+    
+    if (dpmChart) dpmChart.destroy();
+    dpmChart = new Chart(ctx, config);
 }
 
 function updateChart(rMu, rSig, wMu, wSig, retMu, retSig, cacheVccmin, zScore) {
