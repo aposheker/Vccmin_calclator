@@ -42,7 +42,7 @@ $$V_{\text{ccmin(Read)}} = \mu_{\text{Read}} + Z \cdot \sigma_{\text{Read}}$$
 $$V_{\text{ccmin(Write)}} = \mu_{\text{Write}} + Z \cdot \sigma_{\text{Write}}$$
 $$V_{\text{ccmin(Retention)}} = \mu_{\text{Retention}} + Z \cdot \sigma_{\text{Retention}}$$
 
-The final Cache $V_{ccmin}$ is strictly:
+The final Cache $V_{ccmin}$ is strictly (**Note: This is likely not correct. Sometimes overall Vccmin is determined by the worst-case scenario across all failure mechanisms, not just the maximum**):
 $$Cache\ V_{ccmin} = \max(V_{\text{ccmin(Read)}}, V_{\text{ccmin(Write)}}, V_{\text{ccmin(Retention)}})$$
 
 ### D. Comparison to Gumbel-Based Array Vccmin (Thomas et al.)
@@ -98,4 +98,4 @@ To ensure standard scientific robustness, several layers of tests and validation
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ### Disclaimer
-**This is a personal, open-source project.** The views, models, and code presented within this repository are strictly for educational and informational purposes. They do not represent the opinions, strategies, internal methodologies, proprietary intellectual property (IP), or explicit endorsements of any of my past, present, or future employers. All concepts discussed are based entirely on publicly available industry literature and academic research papers.
+**This is a personal, open-source project.** The views, models, and code presented within this repository are strictly for educational and informational purposes. All concepts discussed are based entirely on publicly available industry literature and academic research papers.
