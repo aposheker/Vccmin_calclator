@@ -18,6 +18,9 @@
         <header>
             <h1>SRAM Vccmin Calculator</h1>
             <p>Statistical Cache Yield & Minimum Voltage Modeling</p>
+            <div style="margin-top: 1rem;">
+                <a href="mailto:aposheker@gmail.com?subject=%23Vccmin%20Feedback" class="feedback-btn" style="display: inline-block; color: var(--neon-cyan); text-decoration: none; border: 1px solid var(--neon-cyan); padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; transition: background 0.3s;">Provide Feedback</a>
+            </div>
         </header>
 
         <main>
@@ -34,8 +37,16 @@
 
                 <div class="separator"></div>
 
-                <h2>Cell Margins (mV)</h2>
-                <p class="subtitle">Enter expected mean (μ) and standard deviation (σ) for each failure mechanism</p>
+                <h2>Operating Conditions</h2>
+                <div class="input-group">
+                    <label for="temperature">Temperature (°C)</label>
+                    <input type="number" id="temperature" value="25" min="-40" max="150" step="1">
+                </div>
+
+                <div class="separator"></div>
+
+                <h2>Cell Margins (mV) at 25°C</h2>
+                <p class="subtitle">Enter expected base mean (μ) and standard deviation (σ) for each failure mechanism</p>
 
                 <div class="margin-inputs">
                     <div class="margin-column">

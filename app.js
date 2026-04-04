@@ -47,15 +47,24 @@ function updateCalculator() {
     // Calculate Z score distance from mean
     const zScore = zScoreFromTailP(tailP);
     
-    // 2. Get Cell Specs
-    const rMu = parseFloat(document.getElementById('readMu').value) || 0;
+    // 2. Get Base Cell Specs at 25C
+    const rMuBase = parseFloat(document.getElementById('readMu').value) || 0;
     const rSig = parseFloat(document.getElementById('readSigma').value) || 0;
     
-    const wMu = parseFloat(document.getElementById('writeMu').value) || 0;
+    const wMuBase = parseFloat(document.getElementById('writeMu').value) || 0;
     const wSig = parseFloat(document.getElementById('writeSigma').value) || 0;
     
-    const retMu = parseFloat(document.getElementById('retMu').value) || 0;
+    const retMuBase = parseFloat(document.getElementById('retMu').value) || 0;
     const retSig = parseFloat(document.getElementById('retSigma').value) || 0;
+
+    const temperature = parseFloat(document.getElementById('temperature').value) || 25;
+    const deltaT = temperature - 25;
+
+    // Apply scaling coefficients based on physical modeling
+    // Write Vmin reduces by ~0.4mV/C, Read Vmin increases by ~0.2mV/C, Retention by ~0.4mV/C
+    const rMu = rMuBase + (deltaT * 0.2);
+    const wMu = wMuBase + (deltaT * -0.4);
+    const retMu = retMuBase + (deltaT * 0.4);
 
     // 3. Compute limits
     const readVccmin = rMu + zScore * rSig;
