@@ -34,9 +34,12 @@ function zScoreFromTailP(tailP) {
 function updateCalculator() {
     // 1. Get Array Specs
     const sizeMB = parseFloat(document.getElementById('cacheSize').value) || 0;
-    const yieldTarget = parseFloat(document.getElementById('yieldTarget').value) || 0;
+    let yieldTarget = parseFloat(document.getElementById('yieldTarget').value) || 0;
     
-    if (sizeMB <= 0 || yieldTarget <= 0 || yieldTarget >= 100) return;
+    // Safety Clamps for Math limits
+    if (yieldTarget >= 100) yieldTarget = 99.999999;
+    if (yieldTarget <= 0) yieldTarget = 0.0001;
+    if (sizeMB <= 0) return;
     
     const N = sizeMB * 1024 * 1024 * 8; // total bits
     const Y = yieldTarget / 100.0;
@@ -60,10 +63,16 @@ function updateCalculator() {
     const ebMuBase = parseFloat(document.getElementById('ebMu').value) || 0;
     const ebSig = parseFloat(document.getElementById('ebSigma').value) || 0;
 
-    const temperature = parseFloat(document.getElementById('temperature').value) || 25;
+    let temperature = parseFloat(document.getElementById('temperature').value);
+    if(isNaN(temperature)) temperature = 25;
+    if(temperature > 500) temperature = 500; // Physical Clamp
+    if(temperature < -273) temperature = -273; // Physical Clamp
     const deltaT = temperature - 25;
     
-    const lifetime = parseFloat(document.getElementById('lifetime').value) || 0;
+    let lifetime = parseFloat(document.getElementById('lifetime').value);
+    if(isNaN(lifetime)) lifetime = 0;
+    if(lifetime > 100) lifetime = 100;
+    if(lifetime < 0) lifetime = 0;
     // Lifetime aging coefficient: +5 mV per year degradation for Read, Retention, and EB.
     const ageDegradation = lifetime * 5;
 
@@ -123,8 +132,10 @@ let syncLock = false;
 yieldInput.addEventListener('input', (e) => {
     if(syncLock) return;
     syncLock = true;
-    const y = parseFloat(yieldInput.value);
+    let y = parseFloat(yieldInput.value);
     if(!isNaN(y)) {
+        if(y >= 100) y = 99.9999;
+        if(y <= 0) y = 0.0001;
         dpmInput.value = ((100 - y) * 10000).toFixed(0);
     }
     syncLock = false;
@@ -133,8 +144,10 @@ yieldInput.addEventListener('input', (e) => {
 dpmInput.addEventListener('input', (e) => {
     if(syncLock) return;
     syncLock = true;
-    const d = parseFloat(dpmInput.value);
+    let d = parseFloat(dpmInput.value);
     if(!isNaN(d)) {
+        if(d < 0.1) d = 0.1;
+        if(d >= 1000000) d = 999999;
         yieldInput.value = (100 - (d / 10000)).toFixed(4);
     }
     syncLock = false;

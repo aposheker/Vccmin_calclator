@@ -169,8 +169,8 @@ input[type="number"]:focus {
 
 .margin-inputs {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem 1rem;
 }
 
 .margin-column h3 {
@@ -205,10 +205,13 @@ input[type="number"]:focus {
 }
 
 .stat-value {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 800;
     color: var(--neon-cyan);
     margin: 0.5rem 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .stat-sub {
@@ -272,6 +275,7 @@ input[type="number"]:focus {
     text-align: center;
     position: relative;
     overflow: hidden;
+    word-wrap: break-word;
 }
 
 .vccmin-final::before {
@@ -291,12 +295,13 @@ input[type="number"]:focus {
 }
 
 .final-value {
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: 800;
     color: #fff;
     margin: 0.5rem 0;
     text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
     font-variant-numeric: tabular-nums;
+    word-wrap: break-word;
 }
 
 .final-subtitle {
