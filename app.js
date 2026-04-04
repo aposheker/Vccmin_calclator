@@ -87,14 +87,14 @@ function updateCalculator() {
     const retVccmin = retMu + zScore * retSig;
     
     // 4. Update UI labels
-    document.getElementById('totalBitsLabel').textContent = numFormatter.format(Math.round(N));
+    let shortN = "~" + Math.round(N);
+    if (N >= 1e9) shortN = "~" + (N / 1e9).toFixed(1) + " B";
+    else if (N >= 1e6) shortN = "~" + (N / 1e6).toFixed(1) + " M";
+    else if (N >= 1e3) shortN = "~" + (N / 1e3).toFixed(1) + " K";
+    
+    document.getElementById('totalBitsLabel').textContent = shortN;
     document.getElementById('pFailLabel').textContent = tailP.toExponential(4);
     document.getElementById('zScoreLabel').textContent = zScore.toFixed(3) + 'σ';
-    
-    document.getElementById('readVminOut').textContent = Math.round(readVccmin) + ' mV';
-    document.getElementById('writeVminOut').textContent = Math.round(writeVccmin) + ' mV';
-    document.getElementById('retVminOut').textContent = Math.round(retVccmin) + ' mV';
-    
     // Determine overall cache Vccmin (adding EB Guardband Noise)
     const maxVccmin = Math.max(readVccmin, writeVccmin, retVccmin);
     const finalCacheVccmin = maxVccmin + ebNoise;
@@ -106,13 +106,6 @@ function updateCalculator() {
     
     document.getElementById('cacheVccminOut').textContent = Math.round(finalCacheVccmin) + ' mV';
     document.getElementById('limiterType').textContent = limiter + ` (+${Math.round(ebNoise)}mV EB Noise)`;
-    
-    // 5. Animate Bars - Normalize to 1000mV or the max if > 1000
-    const scaleMax = Math.max(1000, finalCacheVccmin + 50);
-    
-    document.getElementById('readFill').style.width = Math.min(100, (readVccmin / scaleMax) * 100) + '%';
-    document.getElementById('writeFill').style.width = Math.min(100, (writeVccmin / scaleMax) * 100) + '%';
-    document.getElementById('retFill').style.width = Math.min(100, (retVccmin / scaleMax) * 100) + '%';
     
     // 6. Update Distribution Chart
     if (typeof Chart !== 'undefined') {
