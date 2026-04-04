@@ -60,8 +60,7 @@ function updateCalculator() {
     const retMuBase = parseFloat(document.getElementById('retMu').value) || 0;
     const retSig = parseFloat(document.getElementById('retSigma').value) || 0;
 
-    const ebMuBase = parseFloat(document.getElementById('ebMu').value) || 0;
-    const ebSig = parseFloat(document.getElementById('ebSigma').value) || 0;
+    const ebNoise = parseFloat(document.getElementById('ebNoise').value) || 0;
 
     let temperature = parseFloat(document.getElementById('temperature').value);
     if(isNaN(temperature)) temperature = 25;
@@ -81,13 +80,11 @@ function updateCalculator() {
     const rMu = rMuBase + (deltaT * 0.2) + ageDegradation;
     const wMu = wMuBase + (deltaT * -0.4);
     const retMu = retMuBase + (deltaT * 0.4) + ageDegradation;
-    const ebMu = ebMuBase + (deltaT * 0.2) + ageDegradation;
 
     // 3. Compute limits
     const readVccmin = rMu + zScore * rSig;
     const writeVccmin = wMu + zScore * wSig;
     const retVccmin = retMu + zScore * retSig;
-    const ebVccmin = ebMu + zScore * ebSig;
     
     // 4. Update UI labels
     document.getElementById('totalBitsLabel').textContent = numFormatter.format(Math.round(N));
@@ -97,30 +94,29 @@ function updateCalculator() {
     document.getElementById('readVminOut').textContent = Math.round(readVccmin) + ' mV';
     document.getElementById('writeVminOut').textContent = Math.round(writeVccmin) + ' mV';
     document.getElementById('retVminOut').textContent = Math.round(retVccmin) + ' mV';
-    document.getElementById('ebVminOut').textContent = Math.round(ebVccmin) + ' mV';
     
-    // Determine overall cache Vccmin
-    const maxVccmin = Math.max(readVccmin, writeVccmin, retVccmin, ebVccmin);
+    // Determine overall cache Vccmin (adding EB Guardband Noise)
+    const maxVccmin = Math.max(readVccmin, writeVccmin, retVccmin);
+    const finalCacheVccmin = maxVccmin + ebNoise;
+
     let limiter = "---";
     if (maxVccmin === readVccmin) limiter = "Read Vmin (SNM)";
     else if (maxVccmin === writeVccmin) limiter = "Write Vmin (WM)";
-    else if (maxVccmin === retVccmin) limiter = "Retention (DRV)";
-    else limiter = "Erratic Bit";
+    else limiter = "Retention (DRV)";
     
-    document.getElementById('cacheVccminOut').textContent = Math.round(maxVccmin) + ' mV';
-    document.getElementById('limiterType').textContent = limiter;
+    document.getElementById('cacheVccminOut').textContent = Math.round(finalCacheVccmin) + ' mV';
+    document.getElementById('limiterType').textContent = limiter + ` (+${Math.round(ebNoise)}mV EB Noise)`;
     
     // 5. Animate Bars - Normalize to 1000mV or the max if > 1000
-    const scaleMax = Math.max(1000, maxVccmin + 50);
+    const scaleMax = Math.max(1000, finalCacheVccmin + 50);
     
     document.getElementById('readFill').style.width = Math.min(100, (readVccmin / scaleMax) * 100) + '%';
     document.getElementById('writeFill').style.width = Math.min(100, (writeVccmin / scaleMax) * 100) + '%';
     document.getElementById('retFill').style.width = Math.min(100, (retVccmin / scaleMax) * 100) + '%';
-    document.getElementById('ebFill').style.width = Math.min(100, (ebVccmin / scaleMax) * 100) + '%';
     
     // 6. Update Distribution Chart
     if (typeof Chart !== 'undefined') {
-        updateChart(rMu, rSig, wMu, wSig, retMu, retSig, ebMu, ebSig, maxVccmin, zScore);
+        updateChart(rMu, rSig, wMu, wSig, retMu, retSig, finalCacheVccmin, zScore);
     }
 }
 
@@ -207,12 +203,12 @@ function generateGaussianData(mu, sigma, xValues) {
     });
 }
 
-function updateChart(rMu, rSig, wMu, wSig, retMu, retSig, ebMu, ebSig, cacheVccmin, zScore) {
+function updateChart(rMu, rSig, wMu, wSig, retMu, retSig, cacheVccmin, zScore) {
     const ctx = document.getElementById('distributionChart').getContext('2d');
     
     // Generate X values (e.g., 200 to 1200 mV)
-    const minVal = Math.min(rMu - 4*rSig, wMu - 4*wSig, retMu - 4*retSig, ebMu - 4*ebSig, 250);
-    const maxVal = Math.max(rMu + zScore*rSig + 3*rSig, wMu + zScore*wSig + 3*wSig, retMu + zScore*retSig + 3*retSig, ebMu + zScore*ebSig + 3*ebSig, cacheVccmin + 50);
+    const minVal = Math.min(rMu - 4*rSig, wMu - 4*wSig, retMu - 4*retSig, 250);
+    const maxVal = Math.max(rMu + zScore*rSig + 3*rSig, wMu + zScore*wSig + 3*wSig, retMu + zScore*retSig + 3*retSig, cacheVccmin + 50);
     
     const xValues = [];
     for (let x = Math.floor(minVal); x <= Math.ceil(maxVal); x += 2) {
@@ -222,7 +218,6 @@ function updateChart(rMu, rSig, wMu, wSig, retMu, retSig, ebMu, ebSig, cacheVccm
     const readData = generateGaussianData(rMu, rSig, xValues);
     const writeData = generateGaussianData(wMu, wSig, xValues);
     const retData = generateGaussianData(retMu, retSig, xValues);
-    const ebData = generateGaussianData(ebMu, ebSig, xValues);
     
     const data = {
         labels: xValues,
@@ -252,16 +247,6 @@ function updateChart(rMu, rSig, wMu, wSig, retMu, retSig, ebMu, ebSig, cacheVccm
                 data: retData,
                 borderColor: '#10b981',
                 backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                pointRadius: 0,
-                tension: 0.4
-            },
-            {
-                label: `Erratic Bit Vmin (μ=${ebMu})`,
-                data: ebData,
-                borderColor: '#f43f5e',
-                backgroundColor: 'rgba(244, 63, 94, 0.1)',
                 borderWidth: 2,
                 fill: true,
                 pointRadius: 0,

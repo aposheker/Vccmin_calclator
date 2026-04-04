@@ -50,6 +50,10 @@
                     <label for="lifetime">Target Lifetime (Years)</label>
                     <input type="number" id="lifetime" value="0" min="0" max="20" step="0.5">
                 </div>
+                <div class="input-group">
+                    <label for="ebNoise">EB Noise Guardband (mV)</label>
+                    <input type="number" id="ebNoise" value="20" min="0" max="200" step="1">
+                </div>
 
                 <div class="separator"></div>
 
@@ -88,17 +92,6 @@
                         <div class="input-group">
                             <label for="retSigma">σ vmin</label>
                             <input type="number" id="retSigma" value="15">
-                        </div>
-                    </div>
-                    <div class="margin-column">
-                        <h3>Erratic Bit Vmin</h3>
-                        <div class="input-group">
-                            <label for="ebMu">μ vmin</label>
-                            <input type="number" id="ebMu" value="400">
-                        </div>
-                        <div class="input-group">
-                            <label for="ebSigma">σ vmin</label>
-                            <input type="number" id="ebSigma" value="40">
                         </div>
                     </div>
                 </div>
@@ -146,15 +139,6 @@
                         </div>
                         <div class="limit-track">
                             <div class="limit-fill fill-ret" id="retFill"></div>
-                        </div>
-                    </div>
-                    <div class="limit-bar-wrapper">
-                        <div class="limit-label">
-                            <span>Erratic Bit Vccmin</span>
-                            <span class="limit-val" id="ebVminOut">0 mV</span>
-                        </div>
-                        <div class="limit-track">
-                            <div class="limit-fill fill-eb" id="ebFill"></div>
                         </div>
                     </div>
                 </div>

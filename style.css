@@ -169,7 +169,7 @@ input[type="number"]:focus {
 
 .margin-inputs {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 2rem 1rem;
 }
 
@@ -264,7 +264,6 @@ input[type="number"]:focus {
 .fill-read { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
 .fill-write { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
 .fill-ret { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
-.fill-eb { background: var(--neon-rose); box-shadow: 0 0 10px var(--neon-rose); }
 
 .vccmin-final {
     margin-top: 2.5rem;
