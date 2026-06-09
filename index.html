@@ -16,11 +16,11 @@
     <div class="background-mesh"></div>
     <div class="container">
         <header>
-            <h1>SRAM Vccmin Calculator</h1>
-            <p>Statistical Cache Yield & Minimum Voltage Modeling</p>
-            <div style="margin-top: 1rem;">
-                <a href="mailto:aposheker@gmail.com?subject=%23Vccmin%20Feedback" class="feedback-btn" style="display: inline-block; color: var(--neon-cyan); text-decoration: none; border: 1px solid var(--neon-cyan); padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; transition: background 0.3s;">Provide Feedback</a>
+            <div class="header-content">
+                <h1>SRAM Vccmin Calculator</h1>
+                <span class="header-sub">Statistical Cache Yield & Minimum Voltage Modeling</span>
             </div>
+            <a href="mailto:aposheker@gmail.com?subject=%23Vccmin%20Feedback" class="feedback-btn">Provide Feedback</a>
         </header>
 
         <main>
@@ -54,11 +54,11 @@
                     <label for="ebNoise">EB Noise Guardband (mV)</label>
                     <input type="number" id="ebNoise" value="20" min="0" max="200" step="1">
                 </div>
+            </div>
 
-                <div class="separator"></div>
-
+            <div class="glass-panel outputs-panel">
                 <h2>Cell Margins (mV) at 25°C</h2>
-                <p class="subtitle">Enter expected base mean (μ) and standard deviation (σ) for each failure mechanism</p>
+                <p class="subtitle" style="margin-bottom: 0.5rem;">Enter base mean (μ) and standard deviation (σ)</p>
 
                 <div class="margin-inputs">
                     <div class="margin-column">
@@ -95,9 +95,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="glass-panel outputs-panel">
+                <div class="separator"></div>
+
                 <h2>Analysis Results</h2>
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -111,8 +111,6 @@
                         <div class="stat-sub">Cells</div>
                     </div>
                 </div>
-
-
 
                 <div class="vccmin-final">
                     <div class="final-title">Overall Cache Vccmin</div>
