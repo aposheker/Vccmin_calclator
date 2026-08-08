@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SRAM Vccmin Calculator</title>
-    <meta name="description" content="A tool based on statistical SRAM Vccmin models for Cache Vccmin.">
+    <meta name="description" content="Statistical SRAM Vccmin modeling tool for cache minimum voltage estimation with temperature, aging, and erratic bit analysis.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -16,151 +16,138 @@
     <div class="background-mesh"></div>
     <div class="container">
         <header>
-            <h1>SRAM Vccmin Calculator</h1>
-            <p>Statistical Cache Yield & Minimum Voltage Modeling</p>
-            <div style="margin-top: 1rem;">
-                <a href="mailto:aposheker@gmail.com?subject=%23Vccmin%20Feedback" class="feedback-btn" style="display: inline-block; color: var(--neon-cyan); text-decoration: none; border: 1px solid var(--neon-cyan); padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; transition: background 0.3s;">Provide Feedback</a>
+            <div class="header-content">
+                <h1>SRAM Vccmin Calculator</h1>
+                <span class="header-sub">Statistical Cache Yield & Minimum Voltage Modeling</span>
             </div>
+            <nav class="header-nav">
+                <a href="models.html" class="nav-link">Mathematical Models</a>
+                <a href="mailto:aposheker@gmail.com?subject=%23Vccmin%20Feedback" class="feedback-btn" id="feedbackBtn">Feedback</a>
+            </nav>
         </header>
 
         <main>
-            <div class="glass-panel inputs-panel">
-                <h2>Array specifications</h2>
-                <div class="input-group">
-                    <label for="cacheSize">Array Size (MB)</label>
-                    <input type="number" id="cacheSize" value="32" step="0.5" min="0.1">
-                </div>
-                <div class="input-group">
-                    <label for="yieldTarget">Target Array Yield (%)</label>
-                    <input type="number" id="yieldTarget" value="99.0" step="0.1" max="99.9999" min="1">
-                </div>
-                <div class="input-group">
-                    <label for="dpmTarget">Target DPM (Defects Per Million)</label>
-                    <input type="number" id="dpmTarget" value="10000" step="1" min="1">
-                </div>
-
-                <div class="separator"></div>
-
-                <h2>Operating Conditions</h2>
-                <div class="input-group">
-                    <label for="temperature">Temperature (°C)</label>
-                    <input type="number" id="temperature" value="25" min="-40" max="150" step="1">
-                </div>
-                <div class="input-group">
-                    <label for="lifetime">Target Lifetime (Years)</label>
-                    <input type="number" id="lifetime" value="0" min="0" max="20" step="0.5">
-                </div>
-                <div class="input-group">
-                    <label for="ebNoise">EB Noise Guardband (mV)</label>
-                    <input type="number" id="ebNoise" value="20" min="0" max="200" step="1">
-                </div>
-
-                <div class="separator"></div>
-
-                <h2>Cell Margins (mV) at 25°C</h2>
-                <p class="subtitle">Enter expected base mean (μ) and standard deviation (σ) for each failure mechanism</p>
-
-                <div class="margin-inputs">
-                    <div class="margin-column">
-                        <h3>Read Vmin</h3>
+            <!-- === TOP ROW: All Inputs === -->
+            <section class="inputs-row">
+                <div class="glass-panel panel-array">
+                    <h2>Array Specifications</h2>
+                    <div class="compact-inputs">
                         <div class="input-group">
-                            <label for="readMu">μ vmin</label>
-                            <input type="number" id="readMu" value="450">
+                            <label for="cacheSize">Array Size (MB)</label>
+                            <input type="number" id="cacheSize" value="32" step="0.5" min="0.1">
                         </div>
                         <div class="input-group">
-                            <label for="readSigma">σ vmin</label>
-                            <input type="number" id="readSigma" value="25">
-                        </div>
-                    </div>
-                    <div class="margin-column">
-                        <h3>Write Vmin</h3>
-                        <div class="input-group">
-                            <label for="writeMu">μ vmin</label>
-                            <input type="number" id="writeMu" value="480">
+                            <label for="yieldTarget">Yield Target (%)</label>
+                            <input type="number" id="yieldTarget" value="99.0" step="0.1" max="99.9999" min="1">
                         </div>
                         <div class="input-group">
-                            <label for="writeSigma">σ vmin</label>
-                            <input type="number" id="writeSigma" value="30">
+                            <label for="dpmTarget">Target DPM</label>
+                            <input type="number" id="dpmTarget" value="10000" step="1" min="1">
                         </div>
                     </div>
-                    <div class="margin-column">
-                        <h3>Retention Vmin</h3>
+                </div>
+
+                <div class="glass-panel panel-conditions">
+                    <h2>Operating Conditions</h2>
+                    <div class="compact-inputs">
                         <div class="input-group">
-                            <label for="retMu">μ vmin</label>
-                            <input type="number" id="retMu" value="350">
+                            <label for="temperature">Temperature (°C)</label>
+                            <input type="number" id="temperature" value="25" min="-40" max="150" step="1">
                         </div>
                         <div class="input-group">
-                            <label for="retSigma">σ vmin</label>
-                            <input type="number" id="retSigma" value="15">
+                            <label for="lifetime">Lifetime (Years)</label>
+                            <input type="number" id="lifetime" value="0" min="0" max="20" step="0.5">
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-panel outputs-panel">
-                <h2>Analysis Results</h2>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-title">Required Z-Score</div>
-                        <div class="stat-value" id="zScoreLabel">0.00σ</div>
-                        <div class="stat-sub">Cell fail prob: <span id="pFailLabel">0</span></div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Array Size (Bits)</div>
-                        <div class="stat-value" id="totalBitsLabel">0</div>
-                        <div class="stat-sub">Cells</div>
-                    </div>
-                </div>
-
-                <h2 class="mt-8">Limiting Voltages</h2>
-                <div class="limits-container">
-                    <div class="limit-bar-wrapper">
-                        <div class="limit-label">
-                            <span>Read Vccmin</span>
-                            <span class="limit-val" id="readVminOut">0 mV</span>
-                        </div>
-                        <div class="limit-track">
-                            <div class="limit-fill fill-read" id="readFill"></div>
-                        </div>
-                    </div>
-                    <div class="limit-bar-wrapper">
-                        <div class="limit-label">
-                            <span>Write Vccmin</span>
-                            <span class="limit-val" id="writeVminOut">0 mV</span>
-                        </div>
-                        <div class="limit-track">
-                            <div class="limit-fill fill-write" id="writeFill"></div>
-                        </div>
-                    </div>
-                    <div class="limit-bar-wrapper">
-                        <div class="limit-label">
-                            <span>Retention Vccmin</span>
-                            <span class="limit-val" id="retVminOut">0 mV</span>
-                        </div>
-                        <div class="limit-track">
-                            <div class="limit-fill fill-ret" id="retFill"></div>
+                        <div class="input-group">
+                            <label for="ebNoise">EB Guardband (mV)</label>
+                            <input type="number" id="ebNoise" value="20" min="0" max="200" step="1">
                         </div>
                     </div>
                 </div>
 
-                <div class="vccmin-final">
-                    <div class="final-title">Overall Cache Vccmin</div>
-                    <div class="final-value" id="cacheVccminOut">0 mV</div>
-                    <div class="final-subtitle">Determined by <span id="limiterType">---</span></div>
+                <div class="glass-panel panel-margins">
+                    <h2>Cell Margins (mV) <span class="ref-temp">@ 25°C</span></h2>
+                    <div class="margin-inputs">
+                        <div class="margin-column col-read">
+                            <h3>Read</h3>
+                            <div class="margin-pair">
+                                <div class="input-group">
+                                    <label for="readMu">μ</label>
+                                    <input type="number" id="readMu" value="450">
+                                </div>
+                                <div class="input-group">
+                                    <label for="readSigma">σ</label>
+                                    <input type="number" id="readSigma" value="25">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="margin-column col-write">
+                            <h3>Write</h3>
+                            <div class="margin-pair">
+                                <div class="input-group">
+                                    <label for="writeMu">μ</label>
+                                    <input type="number" id="writeMu" value="480">
+                                </div>
+                                <div class="input-group">
+                                    <label for="writeSigma">σ</label>
+                                    <input type="number" id="writeSigma" value="30">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="margin-column col-retention">
+                            <h3>Retention</h3>
+                            <div class="margin-pair">
+                                <div class="input-group">
+                                    <label for="retMu">μ</label>
+                                    <input type="number" id="retMu" value="350">
+                                </div>
+                                <div class="input-group">
+                                    <label for="retSigma">σ</label>
+                                    <input type="number" id="retSigma" value="15">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="glass-panel chart-panel">
-                <h2>Vmin Distributions</h2>
-                <div class="chart-container" style="position: relative; flex: 1; min-height: 150px; width: 100%;">
-                    <canvas id="distributionChart"></canvas>
+            <!-- === BOTTOM ROW: Results + Charts === -->
+            <section class="outputs-row">
+                <div class="glass-panel panel-results">
+                    <h2>Analysis Results</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-title">Z-Score</div>
+                            <div class="stat-value" id="zScoreLabel">0.00σ</div>
+                            <div class="stat-sub">P<sub>fail</sub>: <span id="pFailLabel">0</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Array Size</div>
+                            <div class="stat-value" id="totalBitsLabel">0</div>
+                            <div class="stat-sub">Total Cells</div>
+                        </div>
+                    </div>
+                    <div class="vccmin-final">
+                        <div class="final-title">Cache Vccmin</div>
+                        <div class="final-value" id="cacheVccminOut">0 mV</div>
+                        <div class="final-subtitle">Limited by <span id="limiterType">---</span></div>
+                    </div>
                 </div>
 
-                <h2 style="margin-top: 1rem;">DPM Aging Projection (Constant Vccmin)</h2>
-                <div class="chart-container" style="position: relative; flex: 1; min-height: 150px; width: 100%;">
-                    <canvas id="dpmChart"></canvas>
+                <div class="glass-panel panel-chart-dist">
+                    <h2>Vmin Distributions</h2>
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
                 </div>
-            </div>
+
+                <div class="glass-panel panel-chart-dpm">
+                    <h2>DPM Aging Projection</h2>
+                    <div class="chart-container">
+                        <canvas id="dpmChart"></canvas>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
